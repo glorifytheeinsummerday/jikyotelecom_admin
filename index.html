@@ -87,7 +87,7 @@
             event.preventDefault();
             $.ajax({
                 type: 'POST',
-                url: 'https://www.jikyotelecom.com/admin-dashboard',
+                url: 'http://185.199.108.153:3000/admin-dashboard', // 도메인의 IP 주소 사용
                 data: $(this).serialize(),
                 success: function(response) {
                     if (response.success) {

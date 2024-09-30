@@ -30,5 +30,5 @@ app.post('/admin-dashboard', (req, res) => {
 
 // '0.0.0.0'을 사용하여 모든 네트워크 인터페이스에서 요청 수신
 app.listen(port, '0.0.0.0', () => {
-    console.log(`서버가 http://185.199.108.153:${port}에서 실행 중입니다.`);
+    console.log(`서버가 https://185.199.108.153:${port}에서 실행 중입니다.`);
 });

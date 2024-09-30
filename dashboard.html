@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8">
+    <title>회원 관리 페이지</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            background-color: #f4f4f9;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .button-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 0 10px;
+            background-color: #000000;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+        button:hover {
+            background-color: #333333;
+            transform: scale(1.05);
+        }
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-top: 20px;
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        th, td { 
+            padding: 12px; 
+            text-align: left; 
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #000000;
+            color: white;
+        }
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+        .search-container {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .search-container input {
+            padding: 8px;
+            width: 150px;
+            margin: 0 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+
+<h1>회원 관리 페이지</h1>
+
+<div class="button-container">
+    <button id="btnAddConsult">상담 추가</button>
+    <button id="btnLogout">로그아웃</button>
+</div>
+
+<div class="search-container">
+    <label for="search">검색:</label>
+    <input type="text" id="search" placeholder="이름으로 검색">
+</div>
+
+<table id="consultTable">
+    <thead>
+        <tr>
+            <th>상담 및 완료 날짜</th>
+            <th>고객명</th>
+            <th>핸드폰 번호</th>
+            <th>통신사</th>
+            <th>결합</th>
+            <th>위약금</th>
+            <th>할부금</th>
+            <th>평균 사용량</th>
+            <th>재판매여부</th>
+            <th>상담자</th>
+            <th>수정</th>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- 상담 목록이 여기에 추가됩니다 -->
+    </tbody>
+</table>
+
+<script>
+$(document).ready(function() {
+    function renderTable() {
+        const consultList = JSON.parse(localStorage.getItem('consultList')) || [];
+        const tbody = $('#consultTable tbody');
+        tbody.empty();
+
+        const username = localStorage.getItem('username'); // 로그인한 사용자 이름 가져오기
+
+        consultList.forEach((consult) => {
+            const row = $('<tr>');
+            row.append(`<td>${consult.consultDate} <br> 상담완료: ${consult.completedDate || '상담중'}</td>`);
+            row.append(`<td>${username === 'admin' ? consult.customerName : maskName(consult.customerName)}</td>`); // 이름 마스킹
+            row.append(`<td>${username === 'admin' ? consult.phoneNumber : maskPhoneNumber(consult.phoneNumber)}</td>`); // 전화번호 마스킹
+            row.append(`<td>${consult.carrier}</td>`);
+            row.append(`<td>${consult.bundle}</td>`);
+            row.append(`<td>${consult.penalty}</td>`);
+            row.append(`<td>${consult.installment}</td>`);
+            row.append(`<td>${consult.averageUsage}</td>`);
+            row.append(`<td><input type="checkbox" class="selectCheckbox" ${consult.retail ? 'checked' : ''} disabled></td>`);
+            row.append(`<td>${consult.consultant}</td>`);
+            row.append(`<td><button class="editBtn" data-id="${consult.id}">수정</button></td>`);
+            tbody.append(row);
+        });
+    }
+
+    function maskName(name) {
+        return name.length > 1 ? name[0] + '**' : name; // 첫 글자만 보이고 나머지는 *
+    }
+
+    function maskPhoneNumber(phoneNumber) {
+        const parts = phoneNumber.split('-');
+        if (parts.length === 3) {
+            return `${parts[0]}-****-${parts[2]}`; // 중간 4자리 마스킹
+        }
+        return phoneNumber; // 형식이 맞지 않으면 그대로 반환
+    }
+
+    const isLoggedIn = localStorage.getItem('isLoggedIn'); // 로그인 상태 확인
+
+    // 로그인한 사용자 이름을 localStorage에 저장
+    const username = localStorage.getItem('username');
+    if (!username) {
+        // 로그인하지 않은 경우, 로그인 페이지로 리다이렉트
+        window.location.href = 'index.html';
+    }
+
+    renderTable();
+});
+
+$('#btnAddConsult').on('click', function () {
+    window.location.href = 'edit-consult.html';
+});
+
+$('#consultTable').on('click', '.editBtn', function () {
+    const id = $(this).data('id');
+    window.location.href = `edit-consult.html?id=${id}`;
+});
+
+$('#search').on('input', function() {
+    const searchValue = $(this).val().toLowerCase();
+    $('#consultTable tbody tr').filter(function() {
+        $(this).toggle($(this).text().toLowerCase().indexOf(searchValue) > -1);
+    });
+});
+
+$('#btnLogout').on('click', function() {
+    localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('username'); // 사용자 이름도 제거
+    window.location.href = 'index.html';
+});
+</script>
+
+</body>
+</html>

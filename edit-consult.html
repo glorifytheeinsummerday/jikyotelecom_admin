@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8">
+    <title>상담 수정 및 추가 페이지</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f9;
+            position: relative;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .close-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+            transition: color 0.3s;
+        }
+        .close-button:hover {
+            color: #000;
+        }
+        form {
+            display: flex;
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .form-column {
+            flex: 1;
+            margin-right: 20px;
+        }
+        .form-column:last-child {
+            margin-right: 0;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            box-sizing: border-box;
+        }
+        textarea {
+            height: 100%;
+        }
+        .fixed-size-textarea {
+            width: 622px;
+            height: 515px;
+            resize: none;
+            overflow: auto;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #000000;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+        button:hover {
+            background-color: #333333;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+
+<div class="close-button" id="closeButton">&times;</div>
+
+<h1>상담 수정 및 추가 페이지</h1>
+
+<form id="editConsultForm">
+    <div class="form-column">
+        <div class="form-group">
+            <label for="consultDate">상담 날짜:</label>
+            <input type="date" id="consultDate" name="consultDate" required>
+        </div>
+        <div class="form-group">
+            <label for="customerName">고객명:</label>
+            <input type="text" id="customerName" name="customerName" required>
+        </div>
+        <div class="form-group">
+            <label for="phoneNumber">핸드폰 번호:</label>
+            <input type="text" id="phoneNumber" name="phoneNumber" required>
+        </div>
+        <div class="form-group">
+            <label for="carrier">통신사:</label>
+            <select id="carrier" name="carrier" required>
+                <option value="">선택하세요</option>
+                <option value="SKT">SKT</option>
+                <option value="KT">KT</option>
+                <option value="LG">LG</option>
+                <option value="SK 알뜰">SK 알뜰</option>
+                <option value="KT 알뜰">KT 알뜰</option>
+                <option value="LG 알뜰">LG 알뜰</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="bundle">결합:</label>
+            <input type="text" id="bundle" name="bundle" required>
+        </div>
+        <div class="form-group">
+            <label for="penalty">위약금:</label>
+            <input type="text" id="penalty" name="penalty" required>
+        </div>
+        <div class="form-group">
+            <label for="installment">할부금:</label>
+            <input type="text" id="installment" name="installment" required>
+        </div>
+        <div class="form-group">
+            <label for="averageUsage">평균 사용량:</label>
+            <input type="text" id="averageUsage" name="averageUsage" required>
+        </div>
+        <label for="retail">재판매여부:</label>
+        <input type="checkbox" id="retail" name="retail">
+        <div class="form-group">
+            <label for="consultant">상담자:</label>
+            <select id="consultant" name="consultant" required>
+                <option value="">선택하세요</option>
+                <option value="홍상범">홍상범</option>
+                <option value="김민수">김민수</option>
+                <option value="김주원">김주원</option>
+            </select>
+        </div>
+    </div>
+    
+    <div class="form-column">
+        <div class="form-group">
+            <label for="remarks">상담 내용:</label>
+            <textarea id="remarks" name="remarks" class="fixed-size-textarea"></textarea>
+        </div>
+    </div>
+    
+    <div class="buttonBox" style="flex-basis: 100%;">
+        <button type="submit">저장하기</button>
+    </div>
+</form>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const closeButton = document.getElementById('closeButton');
+        const editConsultForm = document.getElementById('editConsultForm');
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        const consultId = urlParams.get('id');
+
+        if (consultId) {
+            let consultList = JSON.parse(localStorage.getItem('consultList')) || [];
+            const consultData = consultList.find(consult => consult.id === consultId);
+
+            if (consultData) {
+                document.getElementById('consultDate').value = consultData.consultDate;
+                document.getElementById('customerName').value = consultData.customerName;
+                document.getElementById('phoneNumber').value = consultData.phoneNumber;
+                document.getElementById('carrier').value = consultData.carrier;
+                document.getElementById('bundle').value = consultData.bundle;
+                document.getElementById('penalty').value = consultData.penalty;
+                document.getElementById('installment').value = consultData.installment;
+                document.getElementById('averageUsage').value = consultData.averageUsage;
+                document.getElementById('retail').checked = consultData.retail;
+                document.getElementById('consultant').value = consultData.consultant;
+                document.getElementById('remarks').value = consultData.remarks;
+            }
+        }
+
+        closeButton.addEventListener('click', function() {
+            window.location.href = 'dashboard.html';
+        });
+
+        editConsultForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const formData = new FormData(editConsultForm);
+            const updatedConsult = {
+                id: consultId || Date.now().toString(),
+                consultDate: formData.get('consultDate'),
+                customerName: formData.get('customerName'),
+                phoneNumber: formData.get('phoneNumber'),
+                carrier: formData.get('carrier'),
+                bundle: formData.get('bundle'),
+                penalty: formData.get('penalty'),
+                installment: formData.get('installment'),
+                averageUsage: formData.get('averageUsage'),
+                retail: document.getElementById('retail').checked,
+                consultant: formData.get('consultant'),
+                remarks: formData.get('remarks')
+            };
+
+            let consultList = JSON.parse(localStorage.getItem('consultList')) || [];
+            
+            if (consultId) {
+                consultList = consultList.map(consult => 
+                    consult.id === consultId ? updatedConsult : consult
+                );
+            } else {
+                consultList.push(updatedConsult);
+            }
+
+            localStorage.setItem('consultList', JSON.stringify(consultList));
+            window.location.href = 'dashboard.html'; // 저장 후 메인 페이지로 이동
+        });
+    });
+</script>
+
+</body>
+</html>
